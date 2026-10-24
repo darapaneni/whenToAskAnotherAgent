@@ -1,0 +1,202 @@
+{
+  "_comment": "Experiments, sized so that the whole programme costs about USD 7 at list prices and can never exceed total_budget_usd: every run stops when the total spent (all experiments, plus the test calls of check_setup.py) would pass that amount, and when the experiment has used its own budget. Each block under 'calls' gives roles x models (optionally x reasoning efforts) and its sample: n_cal calibration loans (half defaulted, half repaid) and n_test randomly drawn test loans. Samples are nested, so a smaller sample is the first part of a larger one. Calls already in llm_outputs.csv are never repeated, so experiments share calls. 'teams' are the sets of agents on which the orchestration policies are evaluated; an agent is written role@model, or role@model#effort when the effort differs from the registry.",
+  "total_budget_usd": 10.0,
+  "price_scales": [
+    1,
+    100,
+    1000
+  ],
+  "experiments": {
+    "probe": {
+      "title": "Probe: every model on 8 loans (connection, parsing, measured tokens and latency)",
+      "budget_usd": 0.7,
+      "skip_in_all": true,
+      "calls": [
+        {
+          "roles": [
+            "file"
+          ],
+          "models": "@standard",
+          "n_cal": 4,
+          "n_test": 4
+        }
+      ],
+      "teams": {}
+    },
+    "survey": {
+      "title": "Model survey: 19 models read the same application file, with more loans for cheaper models",
+      "budget_usd": 5.8,
+      "calls": [
+        {
+          "roles": [
+            "file"
+          ],
+          "models": "@cheap",
+          "n_cal": 480,
+          "n_test": 720
+        },
+        {
+          "roles": [
+            "file"
+          ],
+          "models": "@mid",
+          "n_cal": 160,
+          "n_test": 240
+        },
+        {
+          "roles": [
+            "file"
+          ],
+          "models": "@upper",
+          "n_cal": 40,
+          "n_test": 60
+        },
+        {
+          "roles": [
+            "file"
+          ],
+          "models": "@top",
+          "n_cal": 16,
+          "n_test": 24
+        }
+      ],
+      "teams": {
+        "cheap_ladder": [
+          "file@gpt-4o-mini",
+          "file@gpt-5-nano",
+          "file@gpt-6-luna",
+          "file@gpt-5-mini"
+        ],
+        "cheap_classes": [
+          "file@gpt-4o-mini",
+          "file@gpt-4.1-mini",
+          "file@gpt-6-luna",
+          "file@gpt-5.6-luna"
+        ],
+        "mid_ladder": [
+          "file@gpt-4.1-mini",
+          "file@gpt-5.4-mini",
+          "file@gpt-4.1"
+        ],
+        "scorecard_then_models": [
+          "scorecard",
+          "file@gpt-4o-mini",
+          "file@gpt-6-luna",
+          "file@gpt-5.4-mini"
+        ],
+        "upper_ladder_small_sample": [
+          "file@gpt-6-luna",
+          "file@gpt-6.1-sol",
+          "file@o3"
+        ]
+      },
+      "select_from": "@cheap",
+      "select_max": 4
+    },
+    "teams": {
+      "title": "Role teams by model class: text reader, file analyst and policy checker",
+      "budget_usd": 2.1,
+      "calls": [
+        {
+          "roles": [
+            "text",
+            "file",
+            "policy"
+          ],
+          "models": [
+            "gpt-4.1-mini",
+            "gpt-6-luna"
+          ],
+          "n_cal": 480,
+          "n_test": 720
+        },
+        {
+          "roles": [
+            "text",
+            "file",
+            "policy"
+          ],
+          "models": [
+            "o3"
+          ],
+          "n_cal": 40,
+          "n_test": 60
+        }
+      ],
+      "teams": {
+        "team_non_reasoning": [
+          "scorecard",
+          "text@gpt-4.1-mini",
+          "file@gpt-4.1-mini",
+          "policy@gpt-4.1-mini"
+        ],
+        "team_general_purpose": [
+          "scorecard",
+          "text@gpt-6-luna",
+          "file@gpt-6-luna",
+          "policy@gpt-6-luna"
+        ],
+        "team_reasoning_small_sample": [
+          "scorecard",
+          "text@o3",
+          "file@o3",
+          "policy@o3"
+        ],
+        "team_mixed_small_sample": [
+          "scorecard",
+          "text@gpt-4.1-mini",
+          "file@gpt-6-luna",
+          "policy@o3"
+        ],
+        "team_two_classes": [
+          "text@gpt-4.1-mini",
+          "file@gpt-4.1-mini",
+          "text@gpt-6-luna",
+          "file@gpt-6-luna"
+        ],
+        "scorecard_only": [
+          "scorecard"
+        ]
+      },
+      "select_from": [
+        "text@gpt-4.1-mini",
+        "file@gpt-4.1-mini",
+        "policy@gpt-4.1-mini",
+        "text@gpt-6-luna",
+        "file@gpt-6-luna",
+        "policy@gpt-6-luna"
+      ],
+      "select_max": 4
+    },
+    "effort": {
+      "title": "Reasoning-effort dial: the same model asked to think harder",
+      "budget_usd": 0.9,
+      "calls": [
+        {
+          "roles": [
+            "file"
+          ],
+          "models": [
+            "gpt-6-luna"
+          ],
+          "efforts": [
+            "none",
+            "low",
+            "medium",
+            "high"
+          ],
+          "n_cal": 200,
+          "n_test": 300
+        }
+      ],
+      "teams": {
+        "effort_gpt-6-luna": [
+          "file@gpt-6-luna#none",
+          "file@gpt-6-luna",
+          "file@gpt-6-luna#medium",
+          "file@gpt-6-luna#high"
+        ]
+      }
+    }
+  }
+}
