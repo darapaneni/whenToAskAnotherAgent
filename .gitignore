@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+data/*.csv
+llm_agents/data/
+llm_agents/spend_ledger.csv
+llm_agents/run.lock
+llm_agents/results_llm_MOCK/
+llm_agents/llm_outputs_MOCK.csv
+results_*/
+*.lock

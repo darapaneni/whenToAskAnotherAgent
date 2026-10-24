@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the article."
+title: "When to ask another agent: code and logged outputs"
+authors:
+  - family-names: Darapaneni
+    given-names: Narayana
+license: MIT
+preferred-citation:
+  type: article
+  title: "When to ask another agent: Value-of-information orchestration of AI agents and human review in credit decisions"
+  authors:
+    - family-names: Darapaneni
+      given-names: Narayana
